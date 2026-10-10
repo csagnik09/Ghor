@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#12151a">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ছবি</title>
+<script>try{var m=(localStorage.getItem("chobi.theme")||"").replace(/"/g,"");if(m!=="light"&&m!=="dark")m="auto";document.documentElement.dataset.theme=m==="auto"?(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark"):m}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 90'%3E%3Crect width='90' height='90' rx='22' fill='%231db954'/%3E%3Cpath d='M36 28v34l28-17z' fill='black' stroke='black' stroke-width='9' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+ <aside id="side">
+  <a class="logo" href="../" title="Back to ঘর"><svg class="mark" viewBox="0 0 90 90" aria-hidden="true"><rect width="90" height="90" rx="22" fill="#1db954"/><path d="M36 28v34l28-17z" fill="#000" stroke="#000" stroke-width="9" stroke-linejoin="round"/></svg><span class="lb">ছবি</span></a>
+  <button class="nav" data-v="home">Home</button>
+  <button class="nav" data-v="movies">Movies</button>
+  <button class="nav" data-v="shows">TV Shows</button>
+  <button class="nav" data-v="folders">Folders</button>
+  <button class="nav" data-v="list">My List</button>
+  <div class="plh"><span>Folders</span></div>
+  <div id="fl"></div>
+  <div class="libst" id="libst"></div>
+ </aside>
+
+ <main id="main">
+  <div id="top">
+   <a class="logo mlogo" href="../" title="Back to ঘর"><svg class="mark" viewBox="0 0 90 90" aria-hidden="true"><rect width="90" height="90" rx="22" fill="#1db954"/><path d="M36 28v34l28-17z" fill="#000" stroke="#000" stroke-width="9" stroke-linejoin="round"/></svg><span class="lb">ছবি</span></a>
+   <div class="sw" id="sw"><input id="q" type="search" placeholder="Search movies, shows, episodes" autocomplete="off" aria-label="Search"></div>
+   <a id="ghorBtn" href="../" aria-label="Back to the ঘর dashboard" title="ঘর dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg></a><button id="setBtn" aria-label="Settings" title="Settings"></button>
+  </div>
+  <div id="view"></div>
+ </main>
+</div>
+
+<section id="player" hidden aria-label="Video player">
+ <video id="pv" playsinline preload="metadata"></video>
+ <div id="pspin" hidden></div>
+ <div id="perr" hidden><div><b>This file won't play in your browser</b><span id="perrT"></span><button class="pbtn" id="perrB">Back to browsing</button></div></div>
+ <div id="pflash"></div>
+ <div class="ptop">
+  <button class="pb" id="pBack" aria-label="Back" title="Back (Esc)"></button>
+  <div class="ptt"><b id="pTitle"></b><span id="pSub"></span></div>
+ </div>
+ <div class="pmid">
+  <button id="mBack" aria-label="Back 10 seconds"></button>
+  <button id="mPlay" aria-label="Play or pause"></button>
+  <button id="mFwd" aria-label="Forward 10 seconds"></button>
+ </div>
+ <div class="pbot">
+  <div class="pseek"><span id="tCur">0:00</span><div id="track" role="slider" aria-label="Seek"><i class="buf"></i><i class="fill"></i><i class="knob"></i><span id="tip">0:00</span></div><span id="tLeft">0:00</span></div>
+  <div class="prow">
+   <button class="pb" id="bPlay" title="Play / pause (Space)" aria-label="Play or pause"></button>
+   <button class="pb" id="bBack" title="Back 10 seconds (J)" aria-label="Back 10 seconds"></button>
+   <button class="pb" id="bFwd" title="Forward 10 seconds (L)" aria-label="Forward 10 seconds"></button>
+   <div id="volw"><button class="pb" id="bMute" title="Mute (M)" aria-label="Mute"></button><input id="vr" type="range" min="0" max="1" step="0.01" aria-label="Volume"></div>
+   <div class="pnow" id="pNow"></div>
+   <button class="pb wide" id="bNext" title="Next (N)"></button>
+   <button class="pb" id="bEps" title="Episodes" aria-label="Episodes"></button>
+   <button class="pb" id="bCC" aria-label="Subtitles"></button>
+   <button class="pb txt" id="bRate" title="Playback speed" aria-label="Playback speed">1×</button>
+   <button class="pb hm" id="bPip" title="Picture in picture" aria-label="Picture in picture"></button>
+   <button class="pb" id="bFull" title="Fullscreen (F)" aria-label="Fullscreen"></button>
+  </div>
+ </div>
+ <div id="pmenu" hidden></div>
+ <div id="upn" hidden>
+  <div class="th" id="upnTh"></div>
+  <div class="uin"><small id="upnL">Next episode</small><b id="upnT"></b>
+   <div class="ubtn"><button id="upnPlay"></button><button id="upnX">Hide</button></div></div>
+  <i id="upnBar"></i>
+ </div>
+ <aside id="drawer" aria-label="Episodes">
+  <div class="dh"><b id="dTitle">Episodes</b><button class="pb" id="dX" aria-label="Close"></button></div>
+  <div id="dSeas"></div>
+  <div id="dList"></div>
+ </aside>
+</section>
+
+<div id="set" role="dialog" aria-modal="true" aria-labelledby="sett"><div class="sbox">
+ <div class="shead"><h3 id="sett">Settings</h3><button id="setx" aria-label="Close">✕</button></div>
+ <section>
+  <h4>Appearance</h4>
+  <div class="seg" id="seg" role="group" aria-label="Theme"><button data-m="auto">Auto</button><button data-m="light">Light</button><button data-m="dark">Dark</button></div>
+  <p class="sn">Auto follows your device's light or dark setting. The player is always dark.</p>
+ </section>
+ <section>
+  <h4>Playback</h4>
+  <div class="srow"><div><b>Autoplay next episode</b><span>Starts the next episode after a short countdown.</span></div><label class="tog"><input type="checkbox" id="sAuto"><span></span></label></div>
+  <div class="srow"><div><b>Show subtitles</b><span>Uses .srt or .vtt files named like the video.</span></div><label class="tog"><input type="checkbox" id="sCC"><span></span></label></div>
+  <div class="srow"><div><b>Watch history</b><span>Resume points and watched marks, saved on the server for every device.</span></div><button class="pill" id="sClr">Clear</button></div>
+ </section>
+ <section>
+  <h4>Library</h4>
+  <div class="srow"><div><b id="sLib">Library folder</b><span id="sLibP"></span></div><button class="pill" id="sScan">Scan now</button></div>
+  <div class="srow"><div><b>Converter</b><span id="sConv"></span></div></div>
+ </section>
+ <section>
+  <h4>Keyboard</h4>
+  <div class="keys">
+   <span><kbd>Space</kbd>Play / pause</span><span><kbd>J</kbd><kbd>L</kbd>Back / forward 10 s</span>
+   <span><kbd>←</kbd><kbd>→</kbd>Back / forward 5 s</span><span><kbd>↑</kbd><kbd>↓</kbd>Volume</span>
+   <span><kbd>F</kbd>Fullscreen</span><span><kbd>C</kbd>Subtitles</span>
+   <span><kbd>N</kbd>Next episode</span><span><kbd>E</kbd>Episodes</span>
+   <span><kbd>0</kbd>–<kbd>9</kbd>Jump to 0–90%</span><span><kbd>/</kbd>Search</span>
+  </div>
+ </section>
+</div></div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="fs" accept=".srt,.vtt" hidden>
+
+<script src="app.js"></script>
+</body>
+</html>

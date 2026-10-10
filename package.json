@@ -1,0 +1,14 @@
+{
+  "name": "ghor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ঘর: a home dashboard that also serves the সুর music player and the ছবি video library from one Node server",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

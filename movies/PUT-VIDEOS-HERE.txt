@@ -1,0 +1,7 @@
+Put your movies and shows in this folder.
+
+Movies:   Inception (2010).mkv  or  Inception (2010)/Inception (2010).mkv
+Shows:    Panchayat/Season 1/Panchayat S01E01.mkv
+Subtitles: a .srt or .vtt file with the same name as the video
+
+New files appear in ছবি within a few seconds.
