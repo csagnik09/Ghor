@@ -5,6 +5,7 @@
     /            ঘর   dashboard (clock, weather, apps, switches, calendar, alarms)
     /sur/        সুর   music, from the music folder
     /chobi/      ছবি   movies and shows, from the movies folder
+    /shared/     theme and full-screen code used by all three
     /api/status  small summary of both libraries, used by the dashboard tiles
 
   Run:  npm start      (or: node server.js)
@@ -64,8 +65,9 @@ const server = http.createServer((req, res) => {
   // the dashboard
   if (req.method !== "GET" && req.method !== "HEAD") { res.writeHead(405, { Allow: "GET, HEAD" }); return res.end(); }
   let p; try { p = decodeURIComponent(u.pathname); } catch { res.writeHead(400); return res.end("Bad request"); }
-  const target = path.resolve(GHOR, "." + (p.endsWith("/") ? p + "index.html" : p));
-  if (!target.startsWith(GHOR + path.sep)) { res.writeHead(403); return res.end("Forbidden"); }
+  const base = p.startsWith("/shared/") ? PUB : GHOR;   // /shared/… is common to all three apps
+  const target = path.resolve(base, "." + (p.endsWith("/") ? p + "index.html" : p));
+  if (!target.startsWith(base + path.sep) || (base === PUB && !target.startsWith(path.join(PUB, "shared") + path.sep))) { res.writeHead(403); return res.end("Forbidden"); }
   serveFile(req, res, target, STATIC[path.extname(target).toLowerCase()] || "application/octet-stream", { "Cache-Control": "no-cache" });
 });
 

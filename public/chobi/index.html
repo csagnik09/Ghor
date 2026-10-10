@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#12151a">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ছবি</title>
-<script>try{var m=(localStorage.getItem("chobi.theme")||"").replace(/"/g,"");if(m!=="light"&&m!=="dark")m="auto";document.documentElement.dataset.theme=m==="auto"?(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark"):m}catch(e){}</script>
+<script src="/shared/home.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 90'%3E%3Crect width='90' height='90' rx='22' fill='%231db954'/%3E%3Cpath d='M36 28v34l28-17z' fill='black' stroke='black' stroke-width='9' stroke-linejoin='round'/%3E%3C/svg%3E">
@@ -30,7 +30,7 @@
   <div id="top">
    <a class="logo mlogo" href="../" title="Back to ঘর"><svg class="mark" viewBox="0 0 90 90" aria-hidden="true"><rect width="90" height="90" rx="22" fill="#1db954"/><path d="M36 28v34l28-17z" fill="#000" stroke="#000" stroke-width="9" stroke-linejoin="round"/></svg><span class="lb">ছবি</span></a>
    <div class="sw" id="sw"><input id="q" type="search" placeholder="Search movies, shows, episodes" autocomplete="off" aria-label="Search"></div>
-   <a id="ghorBtn" href="../" aria-label="Back to the ঘর dashboard" title="ঘর dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg></a><button id="setBtn" aria-label="Settings" title="Settings"></button>
+   <a id="ghorBtn" href="../" aria-label="Back to the ঘর dashboard" title="ঘর dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg></a><button id="fsBtn" aria-label="Full screen" title="Full screen"></button><button id="setBtn" aria-label="Settings" title="Settings"></button>
   </div>
   <div id="view"></div>
  </main>
@@ -85,7 +85,7 @@
  <section>
   <h4>Appearance</h4>
   <div class="seg" id="seg" role="group" aria-label="Theme"><button data-m="auto">Auto</button><button data-m="light">Light</button><button data-m="dark">Dark</button></div>
-  <p class="sn">Auto follows your device's light or dark setting. The player is always dark.</p>
+  <p class="sn">Auto is light from sunrise to sunset. The theme is shared with ঘর and the other app. The player is always dark.</p>
  </section>
  <section>
   <h4>Playback</h4>

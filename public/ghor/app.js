@@ -36,8 +36,9 @@ const L = {
     soundHint: "Tap anywhere on this screen once so alarms can play sound.",
     snooze: "Snooze 5 min", stop: "Stop", snoozed: "Snoozed until {t}",
     settings: "Settings", theme: "Theme",
-    themeAuto: "Auto (light by day, dark by night)", themeLight: "Light", themeDark: "Dark",
+    themeAuto: "Auto (light from sunrise to sunset)", themeLight: "Light", themeDark: "Dark",
     themeShort: { auto: "Auto", light: "Light", dark: "Dark" },
+    themeNote: "The theme is shared with সুর and ছবি.",
     yourName: "Your name (for the greeting)", city: "Weather city", units: "Units", clock: "Clock",
     h12: "12-hour", h24: "24-hour", appButtons: "App buttons", newTab: "Open apps in a new tab",
     switchNote: "Each switch calls a link. Add an OFF link to make it an on/off toggle, or leave it empty for a one-tap button.",
@@ -148,10 +149,7 @@ function toast(msg) {
   const el = $("#toast"); el.textContent = msg; el.classList.add("on");
   clearTimeout(tt); tt = setTimeout(() => el.classList.remove("on"), 2400);
 }
-$("#fs").onclick = () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen?.().catch(() => {});
-};
+Home.fullscreen.bind($("#fs"));
 function net() {
   const on = navigator.onLine;
   $("#net").classList.toggle("off", !on);
@@ -161,27 +159,20 @@ addEventListener("online", () => { net(); loadWeather(); });
 addEventListener("offline", net);
 
 /* =====================================================================
-   Theme — auto follows sunrise/sunset (falls back to 6 AM–6 PM)
+   Theme — shared with সুর and ছবি (see /shared/home.js). Auto follows sunrise/sunset.
    ===================================================================== */
 let sun = null; // {rise, set} for today
-function isDaytime(d = new Date()) {
-  if (sun && iso(sun.rise) === iso(d)) return d >= sun.rise && d < sun.set;
-  const h = d.getHours(); return h >= 6 && h < 18;
-}
 function applyTheme() {
-  const want = cfg.theme === "auto" ? (isDaytime() ? "light" : "dark") : cfg.theme;
-  const root = document.documentElement;
-  if (root.dataset.theme !== want) {
-    root.dataset.theme = want;
-    $('meta[name="theme-color"]').content = want === "light" ? "#e6e5f0" : "#0f1014";
-  }
-  $("#theme").dataset.m = cfg.theme;
-  $("#theme").title = t("theme") + ": " + t("themeShort")[cfg.theme];
+  Home.theme.apply();
+  const want = Home.theme.resolved(), m = Home.theme.mode();
+  $('meta[name="theme-color"]').content = want === "light" ? "#e6e5f0" : "#0f1014";
+  $("#theme").dataset.m = m;
+  $("#theme").title = t("theme") + ": " + t("themeShort")[m];
 }
+Home.theme.onChange(applyTheme);
 $("#theme").onclick = () => {
-  cfg.theme = { auto: "light", light: "dark", dark: "auto" }[cfg.theme] || "auto";
-  saveCfg(); applyTheme();
-  toast(t("theme") + ": " + t("themeShort")[cfg.theme]);
+  Home.theme.set({ auto: "light", light: "dark", dark: "auto" }[Home.theme.mode()] || "auto");
+  toast(t("theme") + ": " + t("themeShort")[Home.theme.mode()]);
 };
 
 /* =====================================================================
@@ -292,6 +283,7 @@ function renderWeather() {
   $("#wUpd").textContent = j._at ? fmtDate(new Date(j._at)) : "—";
 
   sun = { rise: new Date(d.sunrise[0]), set: new Date(d.sunset[0]) };
+  Home.theme.setSun(sun.rise, sun.set);   // so Auto switches at the same moment in সুর and ছবি
   $("#srise").textContent = fmtDate(sun.rise);
   $("#sset").textContent = fmtDate(sun.set);
   const mins = Math.round((sun.set - sun.rise) / 60000);
@@ -657,7 +649,7 @@ function addSwRow(s, focus) {
   return row;
 }
 function openSettings() {
-  $("#sTheme").value = cfg.theme;
+  $("#sTheme").value = Home.theme.mode();
   $("#sName").value = cfg.name;
   $("#sCity").value = cfg.city;
   $("#sUnits").value = cfg.units;
@@ -677,7 +669,6 @@ const fixUrl = u => (u = u.trim()) && !/^([a-z]+:|\/|\.)/i.test(u) ? "http://" +
 $("#setForm").onsubmit = e => {
   e.preventDefault();
   const before = cfg.city + cfg.units;
-  cfg.theme = $("#sTheme").value;
   cfg.name = $("#sName").value.trim();
   cfg.city = $("#sCity").value.trim() || DEFAULTS.city;
   cfg.units = $("#sUnits").value;
@@ -694,6 +685,7 @@ $("#setForm").onsubmit = e => {
       on: fixUrl(r.querySelector(".on").value), off, state: off ? !!old?.state : false };
   });
   saveCfg();
+  Home.theme.set($("#sTheme").value);
   closeSettings();
   applyLang();
   if (before !== cfg.city + cfg.units) loadWeather();
@@ -707,7 +699,6 @@ function applyLang() {
   $$("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
   $("#evTitle").placeholder = t("eventPh");
   $("#alLabel").placeholder = t("labelPh");
-  $("#fs").title = "Full screen";
   $("#openSet").title = t("settings");
   lastMinute = ""; // force date + glance refresh
   net(); applyTheme(); tick(); renderWeather(); renderApps(); renderSwitches(); renderGlance();

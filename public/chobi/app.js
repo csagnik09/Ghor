@@ -658,7 +658,6 @@ function play(v, from) {
 }
 function closePlayer() {
   savePos(true); cancelCountdown(); clearTimeout(T.st); T.seekT = null;
-  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   if (document.pictureInPictureElement) document.exitPictureInPicture().catch(() => {});
   V.pause(); P.hidden = true; $('#drawer').classList.remove('on'); document.body.classList.remove('watching');
   S.cur = null; V.removeAttribute('src'); V.querySelectorAll('track').forEach(t => t.remove()); V.load();
@@ -716,9 +715,8 @@ $('#fs').onchange = async e => {
 
 /* fullscreen, pip, volume, speed */
 function full() {
-  if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
-  const fail = () => { if (V.webkitEnterFullscreen) V.webkitEnterFullscreen(); else toast("Fullscreen isn't available here"); };
-  if (P.requestFullscreen) P.requestFullscreen().catch(fail); else fail();
+  if (Home.fullscreen.supported) { Home.fullscreen.toggle(); return; }
+  if (V.webkitEnterFullscreen) V.webkitEnterFullscreen(); else toast("Fullscreen isn't available here");
 }
 document.addEventListener('fullscreenchange', () => { $('#bFull').innerHTML = ic(document.fullscreenElement ? 'exit' : 'full'); });
 function volUI() { const m = V.muted || V.volume === 0; $('#bMute').innerHTML = ic(m ? 'mute' : 'vol'); const r = $('#vr'); r.value = V.muted ? 0 : V.volume; r.style.setProperty('--p', (V.muted ? 0 : V.volume * 100) + '%'); }
@@ -874,6 +872,7 @@ document.addEventListener('keydown', e => {
   if ($('#set').classList.contains('on')) { if (k === 'Escape') closeSet(); return; }
   if (P.hidden) {
     if (k === '/') { e.preventDefault(); $('#q').focus(); return; }
+    if ((k === 'f' || k === 'F') && !e.target.closest('input,select,textarea')) { full(); return; }
     if ((k === 'Enter' || k === ' ') && e.target.matches('[role=button]')) { e.preventDefault(); e.target.click(); }
     if (k === 'Escape' && S.stack.length) back();
     return;
@@ -931,16 +930,15 @@ document.addEventListener('change', e => { if (e.target.id === 'sort') { S.sort 
 let qT; $('#q').addEventListener('input', e => { clearTimeout(qT); qT = setTimeout(() => { S.q = e.target.value.trim(); render(); }, 160); });
 
 /* ---------- settings ---------- */
-const mq = matchMedia('(prefers-color-scheme: light)');
-function themeMode() { let m = ''; try { m = (localStorage.getItem('chobi.theme') || '').replace(/"/g, ''); } catch (e) {} return m === 'light' || m === 'dark' ? m : 'auto'; }
+/* theme and full screen are shared with ঘর and সুর (/shared/home.js) */
 function applyTheme() {
-  const m = themeMode();
-  document.documentElement.dataset.theme = m === 'auto' ? (mq.matches ? 'light' : 'dark') : m;
+  const m = Home.theme.mode();
   const tc = $('meta[name=theme-color]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue('--panel').trim() || '#12151a';
   $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
 }
-mq.addEventListener?.('change', () => { if (themeMode() === 'auto') applyTheme(); });
-$('#seg').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; try { localStorage.setItem('chobi.theme', b.dataset.m); } catch (x) {} applyTheme(); };
+Home.theme.onChange(applyTheme);
+$('#seg').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; Home.theme.set(b.dataset.m); };
+Home.fullscreen.bind($('#fsBtn'));
 function setInfo() {
   $('#sLib').textContent = `${SV.name} · ${plural(S.videos.length, 'video')}`;
   $('#sLibP').textContent = SV.dir || '';

@@ -56,6 +56,11 @@ It prints the addresses to open:
 
 Open the second address on a phone, tablet or TV. Tap a tile to go into সুর or ছবি; the house button (or the logo) in the app's top bar brings you back to ঘর. Press `Ctrl+C` to stop.
 
+## Theme and full screen
+
+- **One theme for everything.** Light, Dark or Auto set in any app (ঘর's sun/moon button or Settings, or সুর/ছবি Settings → Appearance) applies to all three straight away, including other open tabs. Auto is light from sunrise to sunset, using the times from ঘর's weather. The ছবি video player always stays dark.
+- **Full screen** is the corner-arrows button in every app's top bar (and `F` in ছবি). When you move from one app to another, the browser drops full screen; the first tap on the new page brings it back. iPhones don't allow full screen for web pages, so the button is hidden there; use "Add to Home Screen" instead.
+
 ## Settings
 
 Set these as environment variables before `npm start`.
@@ -86,6 +91,7 @@ $env:MUSIC_DIR="D:\Music"; $env:MOVIES_DIR="D:\Movies"; npm start
 - `lib/sur.js`, `lib/tags.js` – music scanning, tags, covers, streaming
 - `lib/chobi.js` – video scanning, ffmpeg conversion, thumbnails, subtitles
 - `public/ghor`, `public/sur`, `public/chobi` – the three front ends
+- `public/shared/home.js` – the shared theme and full-screen code
 - `.cache/` – thumbnails, covers and file details. Safe to delete; it is rebuilt.
 - `data/chobi.json` – ছবি's watch progress and My List. To keep history from the old standalone ছবি, copy its `data.json` here under this name.
 

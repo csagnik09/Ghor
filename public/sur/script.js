@@ -288,16 +288,15 @@ if("mediaSession"in navigator){const m=navigator.mediaSession,H=(a,f)=>{try{m.se
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&actx&&actx.state!=="running"&&!audio.paused)actx.resume().catch(()=>{})});
 
 /* ---------- settings: theme + equalizer ---------- */
-const mq=matchMedia("(prefers-color-scheme:light)");
-let themeMode="auto";
-try{const m=localStorage.getItem("sur.theme");if(m==="light"||m==="dark")themeMode=m}catch(e){}
+/* theme and full screen are shared with ঘর and ছবি (/shared/home.js) */
 function applyTheme(){
-  document.documentElement.dataset.theme=themeMode==="auto"?(mq.matches?"light":"dark"):themeMode;
-  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===themeMode));
+  const m=Home.theme.mode();
+  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=Home.theme.resolved()==="light"?"#ffffff":"#12151a";
 }
-function setThemeMode(m){themeMode=m;try{localStorage.setItem("sur.theme",m)}catch(e){}applyTheme()}
-(mq.addEventListener?mq.addEventListener("change",()=>{if(themeMode==="auto")applyTheme()}):mq.addListener(()=>{if(themeMode==="auto")applyTheme()}));
-document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>setThemeMode(b.dataset.m));
+Home.theme.onChange(applyTheme);
+document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>Home.theme.set(b.dataset.m));
+Home.fullscreen.bind($("#fsBtn"));
 
 const BANDS=[32,64,125,250,500,1000,2000,4000,8000,16000];
 const PRESETS={
